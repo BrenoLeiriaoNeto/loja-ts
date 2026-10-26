@@ -1,5 +1,5 @@
 import { ValidationError } from '../errors';
-import type { User } from '../interfaces/user';
+import { User } from '../interfaces/user';
 import type { ValidationResult } from './types';
 
 export type CreateUserDTO = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;

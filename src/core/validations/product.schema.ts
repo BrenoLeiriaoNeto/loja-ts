@@ -1,11 +1,11 @@
 import { ValidationError } from '../errors';
-import type { Product } from '../interfaces/product';
+import { Product } from '../interfaces/product';
 import type { ProductStatus } from '../types/product.status';
 import type { ValidationResult } from './types';
 
 export type CreateProductDTO = Omit<Product, 'id' | 'createdAt' | 'updatedAt'>;
 
-const VALID_STATUSES = ['available', 'out_of_stock', 'discontinued'] as const;
+const VALID_PRODUCT_STATUSES = ['available', 'out_of_stock', 'discontinued'] as const;
 
 export const ProductSchema = {
   parse(input: unknown): ValidationResult<CreateProductDTO> {
@@ -43,8 +43,8 @@ export const ProductSchema = {
       parsedPrice = data.price;
     }
 
-    if (typeof data.status !== 'string' || !VALID_STATUSES.includes(data.status as any)) {
-      errors.push(`O campo "status" deve ser ${VALID_STATUSES.join(', ')}.`);
+    if (typeof data.status !== 'string' || !VALID_PRODUCT_STATUSES.includes(data.status as any)) {
+      errors.push(`O campo "status" deve ser ${VALID_PRODUCT_STATUSES.join(', ')}.`);
     } else {
       parsedStatus = data.status as ProductStatus;
     }
