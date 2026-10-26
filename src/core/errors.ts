@@ -20,7 +20,7 @@ export class ValidationError extends DomainError {
   }
 }
 
-export class NotFOundError extends DomainError {
+export class NotFoundError extends DomainError {
   constructor(entity: string, id: string) {
     super(`${entity} com identificador '${id}' não foi encontrado.`, 'NOT_FOUND');
   }
