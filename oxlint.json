@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript"],
+  "categories": {
+    "correctness": "deny",
+    "suspicious": "deny",
+    "perf": "warn"
+  },
+  "options": {
+    "typeAware": true,
+    "reportUnusedDisableDirectives": "deny"
+  },
+  "rules": {
+    "typescript/no-explicit-any": "deny",
+    "typescript/consistent-type-imports": "deny",
+    "typescript/no-floating-promises": "deny",
+    "typescript/await-thenable": "deny"
+  },
+  "ignorePatterns": ["dist", "node_modules", ".bun"]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "infnet-ts-entrega",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "oxlint": "^1.89.0",
+    "oxlint-tsgolint": "^7.0.2005",
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2"
+  },
+  "scripts": {
+    "dev": "bun --watch run src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint -c oxlint.json",
+    "lint:fix": "oxlint -c oxlint.json --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,json,md}\"",
+    "build": "bun build ./src/index.ts --outdir ./dist --target bun"
+  },
+  "type": "module"
+}
