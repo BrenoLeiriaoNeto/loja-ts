@@ -1,7 +1,7 @@
 import { ValidationError } from '../errors';
 import { Order, OrderItem } from '../interfaces/order';
 import { OrderStatus } from '../types/order.status';
-import type { ValidationResult } from './types';
+import type { Result } from './types';
 
 export type CreateOrderDTO = Omit<Order, 'id' | 'createdAt' | 'updatedAt'>;
 
@@ -14,7 +14,7 @@ const VALID_ORDER_STATUSES = [
 ] as const;
 
 export const OrderSchema = {
-  parse(input: unknown): ValidationResult<CreateOrderDTO> {
+  parse(input: unknown): Result<CreateOrderDTO, ValidationError> {
     const errors: string[] = [];
 
     if (!input || typeof input !== 'object') {

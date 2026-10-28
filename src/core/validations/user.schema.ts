@@ -1,11 +1,11 @@
 import { ValidationError } from '../errors';
 import { User } from '../interfaces/user';
-import type { ValidationResult } from './types';
+import type { Result } from './types';
 
 export type CreateUserDTO = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
 
 export const UserSchema = {
-  parse(input: unknown): ValidationResult<CreateUserDTO> {
+  parse(input: unknown): Result<CreateUserDTO, ValidationError> {
     const errors: string[] = [];
 
     if (!input || typeof input !== 'object') {

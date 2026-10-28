@@ -1,12 +1,12 @@
 import { ValidationError } from '../errors';
 import { Financial } from '../interfaces/financial';
 import { Order } from '../interfaces/order';
-import { ValidationResult } from './types';
+import { Result } from './types';
 
 export type CreateFinancialDTO = Omit<Financial, 'id' | 'createdAt' | 'updatedAt'>;
 
 export const FinancialSchema = {
-  parse(input: unknown): ValidationResult<CreateFinancialDTO> {
+  parse(input: unknown): Result<CreateFinancialDTO, ValidationError> {
     const errors: string[] = [];
 
     if (!input || typeof input !== 'object') {

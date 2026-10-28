@@ -1,5 +1,4 @@
-import { ValidationError } from '../errors';
+import { DomainError } from '../errors';
 
-export type ValidationResult<T> =
-  | { readonly success: true; readonly data: T }
-  | { readonly success: false; readonly error: ValidationError };
+export type Result<T, E extends DomainError = DomainError> =
+  { readonly success: true; readonly data: T } | { readonly success: false; readonly error: E };

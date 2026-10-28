@@ -1,14 +1,14 @@
 import { ValidationError } from '../errors';
 import { Product } from '../interfaces/product';
 import type { ProductStatus } from '../types/product.status';
-import type { ValidationResult } from './types';
+import type { Result } from './types';
 
 export type CreateProductDTO = Omit<Product, 'id' | 'createdAt' | 'updatedAt'>;
 
 const VALID_PRODUCT_STATUSES = ['available', 'out_of_stock', 'discontinued'] as const;
 
 export const ProductSchema = {
-  parse(input: unknown): ValidationResult<CreateProductDTO> {
+  parse(input: unknown): Result<CreateProductDTO, ValidationError> {
     const errors: string[] = [];
 
     if (!input || typeof input !== 'object') {
