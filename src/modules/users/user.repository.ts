@@ -1,6 +1,7 @@
-import { NotFoundError, ValidationError } from '@/core/errors';
-import { User } from '@/core/interfaces/user';
-import type { UserId } from '@/core/types/base';
+import type { ValidationError } from '@/core/errors';
+import { NotFoundError } from '@/core/errors';
+import type { User } from '@/core/interfaces/user';
+import { toUserId } from '@/core/utils/type-guards';
 import type { Result } from '@/core/validations/types';
 import { UserSchema } from '@/core/validations/user.schema';
 import { Database } from '@/storage/memory-db';
@@ -14,7 +15,7 @@ export const UserRepository = {
     }
 
     const now = new Date();
-    const newId = crypto.randomUUID() as UserId;
+    const newId = toUserId(crypto.randomUUID());
 
     const newUser = {
       id: newId,
@@ -33,7 +34,7 @@ export const UserRepository = {
   },
 
   findById(id: string): Result<User, NotFoundError> {
-    const user = Database.users.get(id as UserId);
+    const user = Database.users.get(toUserId(id));
 
     if (!user) {
       return {

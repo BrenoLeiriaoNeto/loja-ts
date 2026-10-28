@@ -1,7 +1,7 @@
-import { Financial } from '@/core/interfaces/financial';
-import { Order } from '@/core/interfaces/order';
-import { Product } from '@/core/interfaces/product';
-import { User } from '@/core/interfaces/user';
+import type { Financial } from '@/core/interfaces/financial';
+import type { Order } from '@/core/interfaces/order';
+import type { Product } from '@/core/interfaces/product';
+import type { User } from '@/core/interfaces/user';
 import type { FinancialId, OrderId, ProductId, UserId } from '@/core/types/base';
 
 export const Database: {
