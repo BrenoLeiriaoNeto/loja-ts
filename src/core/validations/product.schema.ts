@@ -1,24 +1,29 @@
 import { ValidationError } from '../errors';
-import { Product } from '../interfaces/product';
+import type { Product } from '../interfaces/product';
 import type { ProductStatus } from '../types/product.status';
+import { isObject } from '../utils/type-guards';
 import type { Result } from './types';
 
 export type CreateProductDTO = Omit<Product, 'id' | 'createdAt' | 'updatedAt'>;
 
-const VALID_PRODUCT_STATUSES = ['available', 'out_of_stock', 'discontinued'] as const;
+const PRODUCT_STATUS_SET = new Set<string>(['available', 'out_of_stock', 'discontinued']);
+
+function isProductStatus(status: string): status is ProductStatus {
+  return PRODUCT_STATUS_SET.has(status);
+}
 
 export const ProductSchema = {
   parse(input: unknown): Result<CreateProductDTO, ValidationError> {
     const errors: string[] = [];
 
-    if (!input || typeof input !== 'object') {
+    if (!isObject(input)) {
       return {
         success: false,
         error: new ValidationError(['O payload deve ser um objeto válido.']),
       };
     }
 
-    const data = input as Record<string, unknown>;
+    const data = input;
 
     let parsedName = '';
     let parsedDescription = '';
@@ -43,10 +48,10 @@ export const ProductSchema = {
       parsedPrice = data.price;
     }
 
-    if (typeof data.status !== 'string' || !VALID_PRODUCT_STATUSES.includes(data.status as any)) {
-      errors.push(`O campo "status" deve ser ${VALID_PRODUCT_STATUSES.join(', ')}.`);
+    if (typeof data.status !== 'string' || !isProductStatus(data.status)) {
+      errors.push(`O campo "status" deve ser ${Array.from(PRODUCT_STATUS_SET).join(', ')}.`);
     } else {
-      parsedStatus = data.status as ProductStatus;
+      parsedStatus = data.status;
     }
 
     if (errors.length > 0) {

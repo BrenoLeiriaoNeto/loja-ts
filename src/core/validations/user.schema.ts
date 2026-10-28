@@ -1,5 +1,6 @@
 import { ValidationError } from '../errors';
-import { User } from '../interfaces/user';
+import type { User } from '../interfaces/user';
+import { isObject } from '../utils/type-guards';
 import type { Result } from './types';
 
 export type CreateUserDTO = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
@@ -8,14 +9,14 @@ export const UserSchema = {
   parse(input: unknown): Result<CreateUserDTO, ValidationError> {
     const errors: string[] = [];
 
-    if (!input || typeof input !== 'object') {
+    if (!isObject(input)) {
       return {
         success: false,
         error: new ValidationError(['O payload deve ser um objeto válido.']),
       };
     }
 
-    const data = input as Record<string, unknown>;
+    const data = input;
 
     let parsedName = '';
     let parsedEmail = '';
