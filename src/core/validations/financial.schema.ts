@@ -1,22 +1,27 @@
 import { ValidationError } from '../errors';
-import { Financial } from '../interfaces/financial';
-import { Order } from '../interfaces/order';
-import { ValidationResult } from './types';
+import type { Financial } from '../interfaces/financial';
+import type { Order } from '../interfaces/order';
+import { isObject } from '../utils/type-guards';
+import type { Result } from './types';
 
 export type CreateFinancialDTO = Omit<Financial, 'id' | 'createdAt' | 'updatedAt'>;
 
+function isOrderEntity(value: unknown): value is Order {
+  return isObject(value) && typeof value.id === 'string' && Array.isArray(value.items);
+}
+
 export const FinancialSchema = {
-  parse(input: unknown): ValidationResult<CreateFinancialDTO> {
+  parse(input: unknown): Result<CreateFinancialDTO, ValidationError> {
     const errors: string[] = [];
 
-    if (!input || typeof input !== 'object') {
+    if (!isObject(input)) {
       return {
         success: false,
         error: new ValidationError(['O payload deve ser um objeto válido.']),
       };
     }
 
-    const data = input as Record<string, unknown>;
+    const data = input;
 
     const parsedOrders: Order[] = [];
     let parsedTotalRevenue = 0;
@@ -29,12 +34,12 @@ export const FinancialSchema = {
       for (let i = 0; i < data.orders.length; i++) {
         const order = data.orders[i];
 
-        if (!order || typeof order !== 'object' || !('id' in order)) {
+        if (!isOrderEntity(order)) {
           errors.push(`O pedido na posição [${i}] deve ser válido.`);
           continue;
         }
 
-        parsedOrders.push(order as Order);
+        parsedOrders.push(order);
       }
     }
 

@@ -1,0 +1,43 @@
+.
+|-- dist/                         - arquivos gerados pela compilacao
+|   |-- index.js
+|-- .gitignore
+|-- oxlint.json
+|-- package.json
+|-- .prettierignore
+|-- .prettierrc
+|-- README.md
+|-- PROJECT_TREE.txt
+|-- src/                          - codigo-fonte da aplicacao
+|   |-- cli/                      - apresentacao e interacao via terminal
+|   |   |-- views.ts
+|   |-- core/                     - contratos, tipos e validacoes compartilhados
+|   |   |-- errors.ts
+|   |   |-- interfaces/           - interfaces dos dados da aplicacao
+|   |   |   |-- base.ts
+|   |   |   |-- financial.ts
+|   |   |   |-- order.ts
+|   |   |   |-- product.ts
+|   |   |   |-- user.ts
+|   |   |-- types/                - tipos e estados do dominio
+|   |   |   |-- base.ts
+|   |   |   |-- order.status.ts
+|   |   |   |-- product.status.ts
+|   |   |-- validations/          - esquemas de validacao dos dados
+|   |       |-- financial.schema.ts
+|   |       |-- order.schema.ts
+|   |       |-- product.schema.ts
+|   |       |-- types.ts
+|   |       |-- user.schema.ts
+|   |-- index.ts
+|   |-- modules/                  - modulos organizados por dominio
+|   |   |-- financial/            - funcionalidades financeiras
+|   |   |-- orders/               - funcionalidades de pedidos
+|   |   |-- products/             - funcionalidades de produtos
+|   |   |-- users/                - funcionalidades de usuarios
+|   |-- storage/                  - persistencia e acesso aos dados
+|       |-- memory-db.ts
+|-- tsconfig.json
+|-- bun.lock
+
+Obs.: .git e node_modules foram omitidos por serem metadados do repositorio e dependencias instaladas.
