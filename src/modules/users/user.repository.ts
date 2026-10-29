@@ -28,7 +28,7 @@ export const UserRepository = {
     Database.users.set(newId, newUser);
 
     return {
-      success: true as const,
+      success: true,
       data: newUser,
     };
   },
@@ -38,14 +38,34 @@ export const UserRepository = {
 
     if (!user) {
       return {
-        success: false as const,
+        success: false,
         error: new NotFoundError('User', id),
       };
     }
 
     return {
-      success: true as const,
+      success: true,
       data: user,
+    };
+  },
+
+  findByName(name: string): Result<User[], NotFoundError> {
+    const searchTerm = name.trim().toLowerCase();
+
+    if (searchTerm.length === 0) {
+      return {
+        success: false,
+        error: new NotFoundError('User', 'termo de busca vazio'),
+      };
+    }
+
+    const matchedUsers = Array.from(Database.users.values()).filter((user) =>
+      user.name.toLowerCase().includes(searchTerm),
+    );
+
+    return {
+      success: true,
+      data: matchedUsers,
     };
   },
 

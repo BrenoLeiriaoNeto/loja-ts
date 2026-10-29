@@ -40,7 +40,7 @@ export const FinancialRepository = {
 
     if (domainErrors.length > 0) {
       return {
-        success: false as const,
+        success: false,
         error: new ValidationError(domainErrors),
       };
     }
@@ -61,7 +61,7 @@ export const FinancialRepository = {
     Database.financials.set(newId, newFinancial);
 
     return {
-      success: true as const,
+      success: true,
       data: newFinancial,
     };
   },
@@ -71,14 +71,53 @@ export const FinancialRepository = {
 
     if (!financial) {
       return {
-        success: false as const,
+        success: false,
         error: new NotFoundError('Financial', id),
       };
     }
 
     return {
-      success: true as const,
+      success: true,
       data: financial,
+    };
+  },
+
+  findByDate(dateInput: Date | string): Result<Financial[], NotFoundError | ValidationError> {
+    const parsedDate = dateInput instanceof Date ? dateInput : new Date(dateInput);
+
+    if (isNaN(parsedDate.getTime())) {
+      return {
+        success: false,
+        error: new ValidationError([
+          'A data informada é invalida. Use o formato AAAA-MM-DD ou DD/MM/AAAA',
+        ]),
+      };
+    }
+
+    const searchYear = parsedDate.getFullYear();
+    const searchMonth = parsedDate.getMonth();
+    const searchDate = parsedDate.getDate();
+
+    const matchedReports = Array.from(Database.financials.values()).filter((report) => {
+      const reportDate = report.dateOfReport;
+      return (
+        reportDate.getFullYear() === searchYear &&
+        reportDate.getMonth() === searchMonth &&
+        reportDate.getDate() === searchDate
+      );
+    });
+
+    if (matchedReports.length === 0) {
+      const formattedSearch = parsedDate.toLocaleDateString('pt-BR');
+      return {
+        success: false,
+        error: new NotFoundError('Financial', `relatório na data ${formattedSearch}`),
+      };
+    }
+
+    return {
+      success: true,
+      data: matchedReports,
     };
   },
 
