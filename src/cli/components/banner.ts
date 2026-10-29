@@ -10,11 +10,10 @@ const colors = {
   blue: '\x1b[34m',
 } as const;
 
-export const Views = {
-  showWelcomeScreen(): void {
-    console.clear();
+export const Banner = (): void => {
+  console.clear();
 
-    const banner = `
+  const banner = `
 ${colors.cyan}${colors.bold}┌─────────────────────────────────────────────────────────────────────────┐
 │                                                                         │
 │   ██╗      ██████╗      ██████╗ █████╗     ████████╗███████╗            │
@@ -29,7 +28,6 @@ ${colors.cyan}${colors.bold}┌────────────────�
 └─────────────────────────────────────────────────────────────────────────┘${colors.reset}
 `;
 
-    console.log(colors.cyan + colors.bold);
-    console.log(banner);
-  },
+  console.log(colors.cyan + colors.bold);
+  console.log(banner);
 };
