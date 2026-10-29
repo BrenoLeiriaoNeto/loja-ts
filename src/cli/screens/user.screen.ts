@@ -7,7 +7,7 @@ type UserAction = 'list' | 'create' | 'find' | 'back';
 const USER_MENU_OPTIONS: MenuOption<UserAction>[] = [
   { id: 'list', label: 'Listar Todos os Usuários', icon: '📋' },
   { id: 'create', label: 'Cadastrar Novo Usuário', icon: '➕' },
-  { id: 'find', label: 'Buscar Usuário por ID', icon: '🔍' },
+  { id: 'find', label: 'Buscar Usuário por Nome', icon: '🔍' },
   { id: 'back', label: 'Voltar ao Menu Principal', icon: '⬅️' },
 ];
 
