@@ -1,1 +1,3 @@
-console.log("Hello via Bun!");
+import { startCLI } from './cli';
+
+void startCLI();
