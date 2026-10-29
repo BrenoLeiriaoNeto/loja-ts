@@ -30,7 +30,7 @@ export const ProductRepository = {
     Database.products.set(newId, newProduct);
 
     return {
-      success: true as const,
+      success: true,
       data: newProduct,
     };
   },
@@ -40,14 +40,34 @@ export const ProductRepository = {
 
     if (!product) {
       return {
-        success: false as const,
+        success: false,
         error: new NotFoundError('Product', id),
       };
     }
 
     return {
-      success: true as const,
+      success: true,
       data: product,
+    };
+  },
+
+  findByName(name: string): Result<Product[], NotFoundError> {
+    const searchTerm = name.trim().toLowerCase();
+
+    if (searchTerm.length === 0) {
+      return {
+        success: false,
+        error: new NotFoundError('User', 'termo de busca vazio'),
+      };
+    }
+
+    const matchedTerm = Array.from(Database.products.values()).filter((p) =>
+      p.name.toLowerCase().includes(searchTerm),
+    );
+
+    return {
+      success: true,
+      data: matchedTerm,
     };
   },
 

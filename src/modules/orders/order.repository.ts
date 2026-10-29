@@ -18,7 +18,7 @@ export const OrderRepository = {
     const userExists = Database.users.has(toUserId(userId));
     if (!userExists) {
       return {
-        success: false as const,
+        success: false,
         error: new NotFoundError('User', userId),
       };
     }
@@ -39,7 +39,7 @@ export const OrderRepository = {
 
       if (product.status !== 'available') {
         domainErrors.push(
-          `Produto '${product.name}' (ID: ${item.productId}) não está disponível para venda. Status atual: ${product.status}.`,
+          `Produto '${product.name}' não está disponível para venda. Status atual: ${product.status}.`,
         );
       }
 
@@ -60,7 +60,7 @@ export const OrderRepository = {
 
     if (domainErrors.length > 0) {
       return {
-        success: false as const,
+        success: false,
         error: new ValidationError(domainErrors),
       };
     }
@@ -81,7 +81,7 @@ export const OrderRepository = {
     Database.orders.set(newId, newOrder);
 
     return {
-      success: true as const,
+      success: true,
       data: newOrder,
     };
   },
@@ -91,14 +91,54 @@ export const OrderRepository = {
 
     if (!order) {
       return {
-        success: false as const,
+        success: false,
         error: new NotFoundError('Order', id),
       };
     }
 
     return {
-      success: true as const,
+      success: true,
       data: order,
+    };
+  },
+
+  findByUser(name: string): Result<Order[], NotFoundError> {
+    const searchTerm = name.trim().toLowerCase();
+
+    if (searchTerm.length === 0) {
+      return {
+        success: false,
+        error: new NotFoundError('Order', 'termo de busca vazio'),
+      };
+    }
+
+    const matchingUserIds = new Set(
+      Array.from(Database.users.values())
+        .filter((user) => user.name.toLowerCase().includes(searchTerm))
+        .map((u) => u.id),
+    );
+
+    if (matchingUserIds.size === 0) {
+      return {
+        success: false,
+        error: new NotFoundError('User', name),
+      };
+    }
+
+    const matchedOrders = Array.from(Database.orders.values()).filter((order) =>
+      matchingUserIds.has(order.userId),
+    );
+
+    if (matchedOrders.length === 0) {
+      return {
+        success: false,
+        error: new NotFoundError('Order', `pedidos para o usuário '${name}'`),
+      };
+    }
+
+    return {
+      success: true,
+      data: matchedOrders,
     };
   },
 

@@ -64,22 +64,21 @@ export async function renderUsersScreen(): Promise<void> {
       case 'find': {
         Layout.showHeader('🔍 BUSCAR USUÁRIO');
 
-        const searchId = await Prompt.text('Informe o ID do Usuário');
-        const result = UserRepository.findById(searchId);
+        const searchName = await Prompt.text('Informe o nome (ou parte dele) do Usuário');
+        const result = UserRepository.findByName(searchName);
 
         if (!result.success) {
           Layout.showError('Busca de Usuário', result.error);
         } else {
           console.log('\n\x1b[36m\x1b[1m--- Dados do Usuário Encontrado --- \x1b[0m');
-          console.table([
-            {
-              ID: result.data.id,
-              Nome: result.data.name,
-              Email: result.data.email,
-              'Criado em': result.data.createdAt.toLocaleString(),
-              'Atualizado em': result.data.updatedAt.toLocaleString(),
-            },
-          ]);
+          console.table(
+            result.data.map((u) => ({
+              ID: u.id,
+              Nome: u.name,
+              Email: u.email,
+              'Criado em: ': u.createdAt.toLocaleString(),
+            })),
+          );
         }
 
         await Prompt.pressEnterToContinue();
