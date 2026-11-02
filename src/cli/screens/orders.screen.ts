@@ -147,9 +147,43 @@ async function handleInteractiveCart(): Promise<void> {
         quantity: qty,
         unitPrice: selectedProduct.price,
       });
+
+      const subtotalMsg = (selectedProduct.price * qty).toFixed(2);
+      console.log(
+        `\n\x1b[32m✅ '${selectedProduct.name}' (x${qty}) adicionado! Subtotal: R$ ${subtotalMsg}\x1b[0m`,
+      );
+      await Prompt.pressEnterToContinue();
     } else if (choice === 'checkout') {
+      console.clear();
+      Layout.showHeader('🛒 RESUMO FINAL DO PEDIDO');
+
+      let totalToPay = 0;
+      const checkoutTable = cartItems.map((item, index) => {
+        const prod = Database.products.get(item.productId);
+        const subtotal = item.unitPrice * item.quantity;
+        totalToPay += subtotal;
+
+        return {
+          Item: index + 1,
+          Produtos: prod ? prod.name : item.productId,
+          Qtd: item.quantity,
+          'Preço Un.': `R$ ${item.unitPrice.toFixed(2)}`,
+          Subtotal: `R$ ${subtotal.toFixed(2)}`,
+        };
+      });
+
+      console.table(checkoutTable);
+      console.log(`\n\x1b[32m\x1b[1mVALOR TOTAL A PAGAR: R$ ${totalToPay.toFixed(2)}\x1b[0m\n`);
+
+      const confirm = await Prompt.text('Confirmar fechamento do pedido? (S/N)');
+
+      if (confirm.toLowerCase() !== 's') {
+        console.log('\n\x1b[33mFechamento cancelado. Retornando ao carrinho...\x1b[0m');
+        await Prompt.pressEnterToContinue();
+        continue;
+      }
+
       const randomUser = users[Math.floor(Math.random() * users.length)];
-      const totalToPay = cartItems.reduce((acc, item) => acc + item.unitPrice * item.quantity, 0);
 
       const createResult = OrderRepository.create({
         userId: randomUser?.id,
@@ -163,7 +197,7 @@ async function handleInteractiveCart(): Promise<void> {
       } else {
         Layout.showSuccess(
           'Pedido Concluído!',
-          `Registrado para '${randomUser?.name}' no valor total de R$ ${totalToPay.toFixed(2)}`,
+          `Operador responsável: '${randomUser?.name}' | Total: R$ ${totalToPay.toFixed(2)}`,
         );
       }
 
