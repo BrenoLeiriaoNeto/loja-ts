@@ -28,6 +28,7 @@ export const ProductSchema = {
     let parsedName = '';
     let parsedDescription = '';
     let parsedPrice = 0;
+    let parsedStockQuantity = 0;
     let parsedStatus: ProductStatus = 'available';
 
     if (typeof data.name !== 'string' || data.name.trim().length === 0) {
@@ -46,6 +47,17 @@ export const ProductSchema = {
       errors.push('O campo "price" deve ser um número válido e positivo.');
     } else {
       parsedPrice = data.price;
+    }
+
+    if (
+      typeof data.stockQuantity !== 'number' ||
+      isNaN(data.stockQuantity) ||
+      data.stockQuantity < 0 ||
+      !Number.isInteger(data.stockQuantity)
+    ) {
+      errors.push('O campo "stockQuantity" deve ser um número válido e positivo.');
+    } else {
+      parsedStockQuantity = data.stockQuantity;
     }
 
     if (typeof data.status !== 'string' || !isProductStatus(data.status)) {
@@ -67,6 +79,7 @@ export const ProductSchema = {
         name: parsedName,
         description: parsedDescription,
         price: parsedPrice,
+        stockQuantity: parsedStockQuantity,
         status: parsedStatus,
       },
     };

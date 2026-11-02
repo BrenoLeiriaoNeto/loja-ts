@@ -24,6 +24,7 @@ export function seedDatabase(): void {
     name: 'Teclado Mecânico RGB',
     description: 'Switch Blue, Layout ABNT2 com anti-ghosting',
     price: 250.0,
+    stockQuantity: 10,
     status: 'available',
   });
 
@@ -31,6 +32,7 @@ export function seedDatabase(): void {
     name: 'Mouse Gamer 16000 DPI',
     description: 'Sensor óptico de alta precisão com cabo trançado',
     price: 120.0,
+    stockQuantity: 15,
     status: 'available',
   });
 
@@ -38,6 +40,7 @@ export function seedDatabase(): void {
     name: 'Monitor UltraWide 29"',
     description: 'Painel IPS Full HD 75Hz com HDR',
     price: 1100.0,
+    stockQuantity: 5,
     status: 'available',
   });
 
@@ -45,6 +48,7 @@ export function seedDatabase(): void {
     name: 'Headset Surround 7.1',
     description: 'Microfone omnidirecional com cancelamento de ruído',
     price: 350.0,
+    stockQuantity: 20,
     status: 'available',
   });
 
@@ -52,6 +56,7 @@ export function seedDatabase(): void {
     name: 'Mousepad Extra Large',
     description: 'Superfície Speed 900x400mm com bordas costuradas',
     price: 80.0,
+    stockQuantity: 25,
     status: 'available',
   });
 }

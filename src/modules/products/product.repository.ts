@@ -1,4 +1,4 @@
-import type { ValidationError } from '@/core/errors';
+import { ValidationError } from '@/core/errors';
 import { NotFoundError } from '@/core/errors';
 import type { Product } from '@/core/interfaces/product';
 import { toProductId } from '@/core/utils/type-guards';
@@ -22,6 +22,7 @@ export const ProductRepository = {
       name: result.data.name,
       description: result.data.description,
       price: result.data.price,
+      stockQuantity: result.data.stockQuantity,
       status: result.data.status,
       createdAt: now,
       updatedAt: now,
@@ -32,6 +33,45 @@ export const ProductRepository = {
     return {
       success: true,
       data: newProduct,
+    };
+  },
+
+  restock(id: string, quantityToAdd: number): Result<Product, NotFoundError | ValidationError> {
+    if (quantityToAdd <= 0 || !Number.isInteger(quantityToAdd)) {
+      return {
+        success: false,
+        error: new ValidationError([
+          'A quantidade a ser adicionada deve ser um número inteiro positivo.',
+        ]),
+      };
+    }
+
+    const product = Database.products.get(toProductId(id));
+
+    if (!product) {
+      return {
+        success: false,
+        error: new NotFoundError('Product', id),
+      };
+    }
+
+    const newStock = product.stockQuantity + quantityToAdd;
+
+    const newStatus =
+      product.status === 'out_of_stock' && newStock > 0 ? 'available' : product.status;
+
+    const updatedProduct: Product = {
+      ...product,
+      stockQuantity: newStock,
+      status: newStatus,
+      updatedAt: new Date(),
+    };
+
+    Database.products.set(updatedProduct.id, updatedProduct);
+
+    return {
+      success: true,
+      data: updatedProduct,
     };
   },
 
@@ -57,7 +97,7 @@ export const ProductRepository = {
     if (searchTerm.length === 0) {
       return {
         success: false,
-        error: new NotFoundError('User', 'termo de busca vazio'),
+        error: new NotFoundError('Product', 'termo de busca vazio'),
       };
     }
 

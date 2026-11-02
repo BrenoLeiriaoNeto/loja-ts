@@ -6,5 +6,6 @@ export interface Product extends BaseEntity<ProductId> {
   name: string;
   description: string;
   price: number;
+  stockQuantity: number;
   status: ProductStatus;
 }
