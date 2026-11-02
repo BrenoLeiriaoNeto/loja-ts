@@ -4,13 +4,13 @@ import type { BaseEntity } from './base';
 
 export interface OrderItem {
   readonly productId: ProductId;
-  quantity: number;
+  readonly quantity: number;
   readonly unitPrice: number;
 }
 
 export interface Order extends BaseEntity<OrderId> {
   readonly userId: UserId;
-  items: OrderItem[];
-  totalPrice: number;
-  status: OrderStatus;
+  readonly items: readonly OrderItem[];
+  readonly totalPrice: number;
+  readonly status: OrderStatus;
 }

@@ -3,8 +3,8 @@ import type { BaseEntity } from './base';
 import type { Order } from './order';
 
 export interface Financial extends BaseEntity<FinancialId> {
-  readonly orders: Order[];
-  totalRevenue: number;
-  dateOfReport: Date;
-  responsiblePerson: string;
+  readonly orders: readonly Order[];
+  readonly totalRevenue: number;
+  readonly dateOfReport: Date;
+  readonly responsiblePerson: string;
 }
