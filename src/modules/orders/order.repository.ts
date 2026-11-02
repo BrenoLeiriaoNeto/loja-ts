@@ -1,5 +1,6 @@
 import { NotFoundError, ValidationError } from '@/core/errors';
 import type { Order } from '@/core/interfaces/order';
+import type { Product } from '@/core/interfaces/product';
 import { toOrderId, toProductId, toUserId } from '@/core/utils/type-guards';
 import { OrderSchema } from '@/core/validations/order.schema';
 import type { Result } from '@/core/validations/types';
@@ -26,6 +27,8 @@ export const OrderRepository = {
     const domainErrors: string[] = [];
     let calculatedTotalPrice = 0;
 
+    const pendingStockUpdates: Array<{ product: Product; newStock: number }> = [];
+
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       if (!item) continue;
@@ -50,6 +53,15 @@ export const OrderRepository = {
       }
 
       calculatedTotalPrice += product.price * item.quantity;
+      const newStock = product.stockQuantity - item.quantity;
+
+      if (newStock < 0) {
+        domainErrors.push(
+          `Estoque insuficiente para o produto '${product.name}'. Estoque atual: ${product.stockQuantity}, Quantidade solicitada: ${item.quantity}.`,
+        );
+      } else {
+        pendingStockUpdates.push({ product, newStock });
+      }
     }
 
     if (totalPrice !== calculatedTotalPrice) {
@@ -66,6 +78,23 @@ export const OrderRepository = {
     }
 
     const now = new Date();
+
+    for (let i = 0; i < pendingStockUpdates.length; i++) {
+      const update = pendingStockUpdates[i];
+      if (!update) continue;
+
+      const { product, newStock } = update;
+
+      const updatedProduct: Product = {
+        ...product,
+        stockQuantity: newStock,
+        status: newStock === 0 ? 'out_of_stock' : product.status,
+        updatedAt: now,
+      };
+
+      Database.products.set(product.id, updatedProduct);
+    }
+
     const newId = toOrderId(crypto.randomUUID());
 
     const newOrder: Order = {

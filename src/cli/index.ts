@@ -1,6 +1,7 @@
 import { promptMainMenu } from './components/menu';
 import { renderFinancialScreen } from './screens/financial.screen';
 import { renderOrdersScreen } from './screens/orders.screen';
+import { renderProductsScreen } from './screens/products.screen';
 import { renderUsersScreen } from './screens/user.screen';
 
 export async function startCLI(): Promise<void> {
@@ -14,7 +15,7 @@ export async function startCLI(): Promise<void> {
         break;
 
       case 'products':
-        // await renderProductsScreen();
+        await renderProductsScreen();
         break;
 
       case 'orders':
