@@ -1,4 +1,4 @@
-# Visão Geral do Projeto
+# 🧭 Visão Geral do Projeto
 
 O **Loja-TS** é um sistema de gestão comercial rodando via CLI (Command Line Interface). O projeto foi construído para demonstrar o domínio de fundamentos de engenharia de software aplicados ao TypeScript, focando em segurança de tipos, controle de estado imutável e arquitetura escalável.
 
@@ -10,7 +10,7 @@ Configuração do Ambiente
 - **TypeScript:** Versão 7.0.2 - Configurado com alto rigor (`strict: true`, `isolatedDeclarations: true`, `verbatimModuleSyntax: true`, eliminando completamente o uso de `any` e inferências inseguras).
 - **Linter:** Oxlint (`typeAware: true`) - Utilizado para checagem estática ultrarrápida, blindando o código contra asserções inseguras de tipos (`no-unsafe-type-assertions`).
 
-## Arquitetura e Organização
+## 🏗️ Arquitetura e Organização
 
 Foi adotada uma arquitetura baseada em módulos, onde cada módulo representa um conjunto completo de funções CRUD básicas separadas em arquivos e isolados de recursos do núcleo da aplicação e de interação direta com a lógica de armazenamento dos dados.
 
@@ -80,7 +80,7 @@ Segue abaixo uma exemplificação da estrutura do projeto e seus diretórios:
 # Obs.: .git, node_modules, diretórios vazios e artefatos gerados (como dist/) foram omitidos.
 ```
 
-## Modelagem e Tipagem
+## 🧩 Modelagem e Tipagem
 
 Para os domínios representados no projeto, eu optei por usar **Interfaces** para descrever seus atributos e tipagem explícita em seus campos para melhor legibilidade. Criei uma interface genérica `BaseEntity` para poder evitar repetição desnecessária de código entre as interfaces de domínio e criei uma tipagem específica em `/types/base.ts` para garantir a unicidade dos IDs de cada um dos domínios. Para Unions e Intersections, foram utilizados sempre **Type**.
 
@@ -124,7 +124,7 @@ export interface Order extends BaseEntity<OrderId> {
 }
 ```
 
-## Validações, gerenciamento de erros e Generics
+## ✅ Validações, gerenciamento de erros e Generics
 
 Para o gerenciamento de erros, decidi criar classes customizadas para facilitar o rastreamento de onde aconteceu o erro, além de agrupar múltiplos erros para facilitar o seu uso em formulários. Para detectar se houve ou não um erro, criei um arquivo `types.ts` em `/validations` que usa o padrão `Result` para retornar um sucesso ou uma falha de validação.
 
@@ -292,32 +292,32 @@ export const Prompt = {
 };
 ```
 
-## Commit em 2 fases e Integridade Transacional
+## 🔄 Commit em 2 fases e Integridade Transacional
 
 A regra de negócio mais complexa está no `OrderRepository.create`. Ao registrar um pedido, o sistema realiza múltiplas validações (existência de usuário, se os preços batem, se há estoque). Para não ferir a imutabilidade e não deixar o banco em memória inconsistente em caso de falha no meio do loop de itens, foi implementado um **Commit em 2 fases**:
 
 1. O sistema valida tudo e armazena os novos estoques em um array de intenção de atualização.
 2. Apenas se **zero erros de domínio** ocorrerem, o sistema efetiva a criação dos novos objetos de `Product` atualizados e salva a ordem.
 
-## Uso Consciente de Classes vs Interfaces
+## 🧱 Uso Consciente de Classes vs Interfaces
 
 O projeto aplica ambos os conceitos de forma complementar:
 
 1. **Interfaces para Entidades de Domínio:** Utilizadas para representar `User`, `Product`, `Order` e `Financial`, garantindo imutabilidade (`readonly`), interoperabilidade com JSON e alinhamento com o gerenciamento de estado no front-end.
 2. **Classes para Infraestrutura de Erros:** A hierarquia de erros em `src/core/errors.ts` (`DomainError`, `NotFoundError`, `ValidationError`) foi implementada utilizando **Classes**, aproveitando o encapsulamento, modificadores de visibilidade e suporte nativo ao operador `instanceof` para capturas em runtime.
 
-## Enums vs String Literal Unions
+## 🔀 Enums vs String Literal Unions
 
 Optou-se pelo uso de **String Literal Unions** (`OrderStatus` e `ProductStatus`) em detrimento dos `enums` numéricos ou de string tradicionais do TypeScript. Essa decisão elimina o código JS gerado por IIFE dos enums nativos, garante zero overhead em runtime e simplifica a serialização e desserialização de payloads de API.
 
-## Outras Decisões Técnicas
+## ⚙️ Outras Decisões Técnicas
 
 1. **Uso de `Map` ao invés de `Array` no Banco em memória:** A busca por ID (ex: `Database.users.get(id)`) cai de uma complexidade O(N) para O(1). Em um cenário simulando alta concorrência de relatórios financeiros, isso previne gargalos de performance.
 2. **Separação estrita CLI x Core:** Nenhuma função do `core` ou dos `modules` usa `console.log`. Todo o retorno de dados vai encapsulado no tipo `Result`. Isso significa que o núcleo deste projeto poderia ser facilmente plugado em uma interface React ou em um servidor Express sem alterar uma linha de regra de negócio.
 3. **Regra `no-await-in-loop` desativada no Linter:** Esta regra foi desativada porque ela fere o comportamento esperado do domínio de I/O da aplicação. Em uma interface interativa de terminal, o `await` sequencial dentro de um loop é obrigatório, pois estamos pausando a execução para esperar uma ação do usuário no teclado.
 4. **Regra `no-unsafe-type-assertion` desativada localmente:** Esta regra só foi desativada _exclusivamente_ no arquivo `type-guard.ts`. O motivo é por causa que os IDs nominais (Branded Types) existem apenas em tempo de compilação, o casting com `as` é estritamente necessário neste arquivo para converter strings primitivas geradas pelo `crypto.randomUUID()`. Isso concentra e isola essa exceção de tipagem em um único ponto centralizado, blindando o restante do sistema.
 
-## Uso de IA
+## 🤖 Uso de IA
 
 O meu uso de IA se resume nas seguintes áreas:
 
