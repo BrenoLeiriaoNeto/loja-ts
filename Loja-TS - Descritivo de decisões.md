@@ -12,8 +12,6 @@ Configuração do Ambiente
 
 ## Arquitetura e Organização
 
----
-
 Foi adotada uma arquitetura baseada em módulos, onde cada módulo representa um conjunto completo de funções CRUD básicas separadas em arquivos e isolados de recursos do núcleo da aplicação e de interação direta com a lógica de armazenamento dos dados.
 
 O motivo dessa escolha é para a simplificação da criação do projeto que tem o foco no uso extensivo dos recursos de Typescript, mas sem deixar de lado os benefícios da organização de uma **Arquitetura Modular Pragmática (Vertical Slices)**.
