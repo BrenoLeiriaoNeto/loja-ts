@@ -1,7 +1,7 @@
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  createdAt: Date;
-  updatedAt: Date;
+import type { UserId } from '../types/base';
+import type { BaseEntity } from './base';
+
+export interface User extends BaseEntity<UserId> {
+  readonly name: string;
+  readonly email: string;
 }
