@@ -301,6 +301,17 @@ A regra de negócio mais complexa está no `OrderRepository.create`. Ao registra
 1. O sistema valida tudo e armazena os novos estoques em um array de intenção de atualização.
 2. Apenas se **zero erros de domínio** ocorrerem, o sistema efetiva a criação dos novos objetos de `Product` atualizados e salva a ordem.
 
+## Uso Consciente de Classes vs Interfaces
+
+O projeto aplica ambos os conceitos de forma complementar:
+
+1. **Interfaces para Entidades de Domínio:** Utilizadas para representar `User`, `Product`, `Order` e `Financial`, garantindo imutabilidade (`readonly`), interoperabilidade com JSON e alinhamento com o gerenciamento de estado no front-end.
+2. **Classes para Infraestrutura de Erros:** A hierarquia de erros em `src/core/errors.ts` (`DomainError`, `NotFoundError`, `ValidationError`) foi implementada utilizando **Classes**, aproveitando o encapsulamento, modificadores de visibilidade e suporte nativo ao operador `instanceof` para capturas em runtime.
+
+## Enums vs String Literal Unions
+
+Optou-se pelo uso de **String Literal Unions** (`OrderStatus` e `ProductStatus`) em detrimento dos `enums` numéricos ou de string tradicionais do TypeScript. Essa decisão elimina o código JS gerado por IIFE dos enums nativos, garante zero overhead em runtime e simplifica a serialização e desserialização de payloads de API.
+
 ## Outras Decisões Técnicas
 
 1. **Uso de `Map` ao invés de `Array` no Banco em memória:** A busca por ID (ex: `Database.users.get(id)`) cai de uma complexidade O(N) para O(1). Em um cenário simulando alta concorrência de relatórios financeiros, isso previne gargalos de performance.
@@ -314,12 +325,17 @@ O meu uso de IA se resume nas seguintes áreas:
 
 - Brainstorming para decidir qual a melhor arquitetura para um projeto focado totalmente em recursos de Typescript;
   - Recusei propostas de Clean Architecture e CQRS, optando pela arquitetura modula pragmática (vertical slices) para um projeto deste tamanho e escopo.
-- Breve entendimento e comparação entre **Interfaces** e **Types**, para poder analisar qual seria melhor para modelos de domínio e schemas de validação;
+- Breve entendimento e comparação entre **Interfaces**, **Classes** e **Types**, para poder analisar qual seria melhor para modelos de domínio e schemas de validação;
 - Auxílio na configuração do arquivo `tsconfig.json` e do linter `oxlint.json`, dando prioridade na configuração de um ambiente bem estrito de tipagem e evitar `any` e `unknown` em excesso;
 - Uso extensivo da IA como um code reviewer, analisando a qualidade do código que escrevo de acordo com as boas práticas de typescript, bem como se está sendo utilizado os recursos mais recentes de forma ideal e de acordo com as regras dos arquivos de configuração do projeto;
 - Breve discussão para como criar IDs únicos para os modelos de domínio, ja que o armazenamento de dados será feito em memória;
   - Decidi por optar pela utilização dos **Branded Types** e anotação string para os IDs para forçar uma validação estrita pelo Typescript, ja que irei usar o recurso `crypto.randomUUID()` para gerar os IDs em memória durante a execução.
 - Uso fundamental para aprender sobre layouts em linha de comando (CLI), controle de eventos em Raw mode (`process.stdin`) e injeção de cores ANSI nativas, bem como na aceleração da estruturação do mesmo, deixando o layout e roteamento via CLI sob responsabilidade da IA e o esforço cognitivo humano responśavel apenas na lógica e modelagem de dados;
 - Uso da IA como _Pair Programmer_ para poder aprender, implementar, validar, debugar, testar e corrigir o projeto em uma menor quantidade de tempo.
+
+IAs utilizadas:
+
+- **Google Gemini Web:** Usei o Gemini primariamente como _Pair Programmer_ e para tirar dúvidas de TypeScript, Console API e de arquitetura no geral;
+- **GitHub Copilot:** Usei o GitHub Copilot em modo Agente direto no VS Code como um code reviewer rigoroso configurado para o TypeScript na versão 7.0.2 e sempre referenciando os arquivos `tsconfig.json` e `oxlint.json` para oferecer os melhores logs de debugging possíveis.
 
 **Conclusão sobre IA:** Ela potencializa muito a velocidade e oferece soluções pragmáticas, mas não substitui a responsabilidade do engenheiro de software de aplicar Design Patterns adequados e auditar a coerência do sistema contra as restrições estritas do compilador. Em outras palavras, a IA escreve mas quem orquestra e aprova a segurança transacional da aplicação é o desenvolvedor.
