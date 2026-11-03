@@ -3,9 +3,9 @@ import type { ProductStatus } from '../types/product.status';
 import type { BaseEntity } from './base';
 
 export interface Product extends BaseEntity<ProductId> {
-  name: string;
-  description: string;
-  price: number;
-  stockQuantity: number;
-  status: ProductStatus;
+  readonly name: string;
+  readonly description: string;
+  readonly price: number;
+  readonly stockQuantity: number;
+  readonly status: ProductStatus;
 }
