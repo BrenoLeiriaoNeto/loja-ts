@@ -4,7 +4,7 @@ O **Loja-TS** é um sistema de gestão comercial rodando via CLI (Command Line I
 
 Nenhuma biblioteca externa de terceiros (como Zod, Chalk ou Inquirer) foi utilizada para a lógica de negócio ou interface, forçando a implementação de tipagens avançadas, schemas nativos e manipulação de API do Console via Raw Mode.
 
-Configuração do Ambiente
+## ⚙️ Configuração do Ambiente
 
 - **Runtime:** Bun (v1.4.2) - Escolhido pela altíssima performance, suporte nativo a TypeScript sem transpilação prévia e velocidade de execução.
 - **TypeScript:** Versão 7.0.2 - Configurado com alto rigor (`strict: true`, `isolatedDeclarations: true`, `verbatimModuleSyntax: true`, eliminando completamente o uso de `any` e inferências inseguras).
@@ -310,12 +310,42 @@ O projeto aplica ambos os conceitos de forma complementar:
 
 Optou-se pelo uso de **String Literal Unions** (`OrderStatus` e `ProductStatus`) em detrimento dos `enums` numéricos ou de string tradicionais do TypeScript. Essa decisão elimina o código JS gerado por IIFE dos enums nativos, garante zero overhead em runtime e simplifica a serialização e desserialização de payloads de API.
 
+## 🔒 Classes, Encapsulamento e a Ausência de Membros Estáticos
+
+No projeto, o uso de **classes** foi reservado estritamente para a infraestrutura de exceções no domínio (`src/core/errors.ts`). A classe abstrata `DomainError` e suas especializações (`ValidationError`, `NotFoundError`) utilizam herança, modificadores de visibilidade (`public readonly`) e encapsulamento avançado na construção da instância (manipulando `Object.setPrototypeOf`). Isso garante o rastreamento correto do `prototype` e a integridade da hierarquia de erros em tempo de execução.
+
+**Por que evitamos membros `static` nos repositórios:**
+A rubrica avaliativa sugere o uso de membros estáticos _quando apropriado_. Em arquiteturas orientadas a objetos clássicas (como Java ou C#), é comum criar classes repletas de métodos `static` para servirem como _Singletons_ ou Repositórios. Em TypeScript idiomático, no entanto, isso é considerado um _anti-pattern_ (classes vazias que só agrupam funções). Optamos por usar módulos e objetos literais exportados (`export const OrderRepository = { ... }` e `export const Database = { ... }`), que são mais limpos, não geram overhead de construtores no bundle compilado e cumprem o mesmo papel de isolamento.
+
+**Onde o `static` faria sentido neste projeto (Exemplo Teórico):**
+Um local onde o uso de um membro estático seria arquiteturalmente correto seria dentro da própria classe `DomainError`, implementando um _Type Guard_ estático como um método utilitário da classe (Factory/Type Guard Pattern). Exemplo de como poderia ser implementado:
+
+```typescript
+export abstract class DomainError extends Error {
+  public readonly errorName: string;
+  public readonly code: string;
+  public readonly details? string[] | undefined;
+
+  constructor(message: string, code: string, details?: string[]){
+    // ... setup
+  }
+
+  // Possível uso de membro estático perfeitamente adequado à arquitetura
+  public static isDomainError(err: unknown): err is DomainError {
+    return err instanceof DomainError;
+  }
+}
+
+```
+
+Optei por não incluir esse membro estático porque a nossa arquitetura implementa o padrão funcional `Result<T, E>`. Como nunca lançamos erros de domínio via `throw` na camada de serviço, a CLI nunca precisa capturar erros desconhecidos via `try/catch` e testá-los com `instanceof` ou Type Guards estáticos. O retorno já é sempre tipado e previsível.
+
 ## ⚙️ Outras Decisões Técnicas
 
 1. **Uso de `Map` ao invés de `Array` no Banco em memória:** A busca por ID (ex: `Database.users.get(id)`) cai de uma complexidade O(N) para O(1). Em um cenário simulando alta concorrência de relatórios financeiros, isso previne gargalos de performance.
 2. **Separação estrita CLI x Core:** Nenhuma função do `core` ou dos `modules` usa `console.log`. Todo o retorno de dados vai encapsulado no tipo `Result`. Isso significa que o núcleo deste projeto poderia ser facilmente plugado em uma interface React ou em um servidor Express sem alterar uma linha de regra de negócio.
 3. **Regra `no-await-in-loop` desativada no Linter:** Esta regra foi desativada porque ela fere o comportamento esperado do domínio de I/O da aplicação. Em uma interface interativa de terminal, o `await` sequencial dentro de um loop é obrigatório, pois estamos pausando a execução para esperar uma ação do usuário no teclado.
-4. **Regra `no-unsafe-type-assertion` desativada localmente:** Esta regra só foi desativada _exclusivamente_ no arquivo `type-guard.ts`. O motivo é por causa que os IDs nominais (Branded Types) existem apenas em tempo de compilação, o casting com `as` é estritamente necessário neste arquivo para converter strings primitivas geradas pelo `crypto.randomUUID()`. Isso concentra e isola essa exceção de tipagem em um único ponto centralizado, blindando o restante do sistema.
+4. **Regra `no-unsafe-type-assertion` desativada localmente:** Esta regra só foi desativada _exclusivamente_ no arquivo `type-guards.ts`. O motivo é por causa que os IDs nominais (Branded Types) existem apenas em tempo de compilação, o casting com `as` é estritamente necessário neste arquivo para converter strings primitivas geradas pelo `crypto.randomUUID()`. Isso concentra e isola essa exceção de tipagem em um único ponto centralizado, blindando o restante do sistema.
 
 ## 🤖 Uso de IA
 
@@ -337,3 +367,17 @@ IAs utilizadas:
 - **GitHub Copilot:** Usei o GitHub Copilot em modo Agente direto no VS Code como um code reviewer rigoroso configurado para o TypeScript na versão 7.0.2 e sempre referenciando os arquivos `tsconfig.json` e `oxlint.json` para oferecer os melhores logs de debugging possíveis.
 
 **Conclusão sobre IA:** Ela potencializa muito a velocidade e oferece soluções pragmáticas, mas não substitui a responsabilidade do engenheiro de software de aplicar Design Patterns adequados e auditar a coerência do sistema contra as restrições estritas do compilador. Em outras palavras, a IA escreve mas quem orquestra e aprova a segurança transacional da aplicação é o desenvolvedor.
+
+---
+
+<details>
+  <summary><b>📋 Índice de Evidências (Mapeamento para Avaliação)</b></summary>
+
+| Critério                               | Aplicação no Projeto                                                                                                                             | Onde Conferir no Código                                                                                                                                                                             |
+| :------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. Tipagem Estática e Inferência**   | Primitivos, _String Literal Unions_ de status, inferência local vs. contratos explícitos e _narrowing_ via `Result`                              | [`src/core/types/`](./src/core/types/), [`src/core/interfaces/`](./src/core/interfaces/) e [`src/core/validations/types.ts`](./src/core/validations/types.ts)                                       |
+| **2. Contratos, Interfaces e Classes** | Interfaces `readonly` com `BaseEntity<T>`, interseções (_Branded Types_), _spread_ imutável no Two-Phase Commit e classes na hierarquia de erros | [`src/core/interfaces/base.ts`](./src/core/interfaces/base.ts), [`src/modules/orders/order.repository.ts`](./src/modules/orders/order.repository.ts) e [`src/core/errors.ts`](./src/core/errors.ts) |
+| **3. Generics e Abstrações Seguras**   | Zero `any`, entrada `unknown` validada por _Type Guards_, `typeof`, asserções isoladas, `Result<T, E>`, `Prompt.select<T>` e `Omit<>`            | [`src/core/utils/type-guards.ts`](./src/core/utils/type-guards.ts), [`src/core/validations/`](./src/core/validations/) e [`src/cli/components/prompt.ts`](./src/cli/components/prompt.ts)           |
+| **4. Ambiente, Refatoração e IA**      | `tsconfig.json` estrito, Bun, `oxlint` com regras justificadas, ECMAScript moderno (`Map`, `randomUUID`) e análise crítica de IA                 | [`tsconfig.json`](./tsconfig.json), [`oxlint.json`](./oxlint.json) e [`src/storage/memory-db.ts`](./src/storage/memory-db.ts)                                                                       |
+
+</details>
