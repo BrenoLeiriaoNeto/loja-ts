@@ -346,6 +346,7 @@ Optei por não incluir esse membro estático porque a nossa arquitetura implemen
 2. **Separação estrita CLI x Core:** Nenhuma função do `core` ou dos `modules` usa `console.log`. Todo o retorno de dados vai encapsulado no tipo `Result`. Isso significa que o núcleo deste projeto poderia ser facilmente plugado em uma interface React ou em um servidor Express sem alterar uma linha de regra de negócio.
 3. **Regra `no-await-in-loop` desativada no Linter:** Esta regra foi desativada porque ela fere o comportamento esperado do domínio de I/O da aplicação. Em uma interface interativa de terminal, o `await` sequencial dentro de um loop é obrigatório, pois estamos pausando a execução para esperar uma ação do usuário no teclado.
 4. **Regra `no-unsafe-type-assertion` desativada localmente:** Esta regra só foi desativada _exclusivamente_ no arquivo `type-guards.ts`. O motivo é por causa que os IDs nominais (Branded Types) existem apenas em tempo de compilação, o casting com `as` é estritamente necessário neste arquivo para converter strings primitivas geradas pelo `crypto.randomUUID()`. Isso concentra e isola essa exceção de tipagem em um único ponto centralizado, blindando o restante do sistema.
+5. **Sem refatoração de JavaScript:** Não houve refatoração de arquivos JavaScript porquê o projeto foi criado diretamente em TypeScript através do CLI do Bun.
 
 ## 🤖 Uso de IA
 
